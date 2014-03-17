@@ -1,0 +1,7 @@
+> Enter one of the following commands:
+* create
+* add <name>
+* list 
+* load
+* status
+* statistics
