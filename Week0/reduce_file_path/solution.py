@@ -1,50 +1,39 @@
 def remove_double_slash(string):
-	while string.find('//') != -1:
+	while '//' in string:
 		string = string.replace('//', '/')
-
 	return string
+
+def get_subpaths(path):
+	if path.endswith('/') and path.startswith('/'):
+		return path[1:-1].split('/')
+	else:
+		return path[1:].split('/')
 
 
 def reduce_file_path(path):
 	# /smth//smthg/./fggh/../
 
-	path = remove_double_slash(path)
-
-	#dividing path into subpaths
-	subpaths = []
-	start = 0
-	end = 0
-
-	while end != len(path)-1:
-		start = end
-		end = path.find('/', start+1)
-		if end == -1:
-			subpaths.append(path[start+1:])
-			break
-		subpaths.append(path[start+1:end])
-
+	list_of_subpaths = [subpath for subpath in get_subpaths(path) if subpath != '']
+	subpaths = ['/']
 
 	#reducing path
-	if len(subpaths) == 0 or len(subpaths) == 1:
+	if len(list_of_subpaths) == 0 or path == "/":
 		return '/'
-	
+
 	else:
-		for subpath in reversed(subpaths):
-			if subpath == '..':
-				i = subpaths.index(subpath)
-				subpaths = subpaths[:i-1]+subpaths[i+1:]
+		for subpath in list_of_subpaths:
+			if subpath == '..' and len(subpaths) > 0:
+				subpaths.pop()
 
-			if subpath == '.':
-				subpaths.remove(subpath)
-
+			elif subpath == '.':
+				continue
+			else:
+				subpaths.append(subpath)
 
 	if len(subpaths) == 0:
 		return '/'
 
-	path = ''
-
-	for subpath in subpaths:
-			path += '/' + subpath
+	path = '/'.join(subpaths)
+	path = remove_double_slash(path)
 
 	return path
-
