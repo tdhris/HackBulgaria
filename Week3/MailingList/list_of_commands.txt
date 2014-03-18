@@ -1,0 +1,9 @@
+Here is a full list of commands:
+* show_lists
+* show_list <unique_list_identifier>
+* add <unique_list_identifier>
+* create <list_name>
+* search_email <email>
+* merge_lists <list_identifier_1> <list_identifier_2> <new_list_name>
+* export <unique_list_identifier>
+* exit
