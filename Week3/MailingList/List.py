@@ -1,3 +1,5 @@
+import json
+
 class Person:
 	def __init__(self, name, email):
 		self.name = name
@@ -126,3 +128,70 @@ def find_email(email):
 	 	if is_in_list(list_filename, email):
 	 		mailing_lists.append(list_name)
 	return mailing_lists
+
+
+def merge_lists(first_list, second_list, name_new_list):
+	merged_list = List(name_new_list)
+	merged_list_filename = get_valid_filename(merged_list.list_name)
+	on_both_lists = get_people_from_list(first_list) + get_people_from_list(second_list)
+	unique_subscribers = get_unique_subscribers(on_both_lists)
+	for person in unique_subscribers:
+		add_person_to_list_file(person, merged_list_filename)
+
+
+def get_people_from_list(list_index):
+	list_filename = get_list_from_archive(list_index)
+	list_people = []
+	file =  open(list_filename, "r")
+	for line in file:
+		list_people.append(get_person_from_list_entry(line))
+	return list_people
+
+
+def get_person_from_list_entry(list_entry):
+	personal_info = [info.rstrip('\n') for info in list_entry.split()[1:] if info != '-']
+	name, email = '', ''
+	for info in personal_info:
+		if '@' not in info:
+			name += info + ' '
+		else:
+			email = info
+	subscriber = Person(name.rstrip('\n'), email)
+	return subscriber
+
+
+def get_unique_subscribers(on_both_lists):
+	unique_subscribers = []
+	for person in on_both_lists:
+	 	if email_not_in_list(person.email, unique_subscribers):
+	 		unique_subscribers.append(person)
+	return unique_subscribers
+
+
+def email_not_in_list(email, list):
+	not_in_list = True
+	for person in list:
+		if email == person.email:
+			not_in_list = False
+			break
+	return not_in_list
+
+def dictionary_with_people(list_index):
+	people = get_people_from_list(list_index)
+	people_on_list = []
+	for person in people:
+		personal_info = {}
+		personal_info["name: "] = person.name
+		personal_info["email: "] = person.email
+		people_on_list.append(personal_info)
+	return people_on_list
+
+
+def export(list_index):
+	people_on_list = dictionary_with_people(list_index)
+	print(people_on_list)
+	list_filename = get_list_from_archive(list_index)
+	json_filename = list_filename.replace(".txt", ".json")
+	file = open(json_filename, "w").close()
+	with open(json_filename, "a") as file:
+		file.write(json.dumps(people_on_list, file, sort_keys=True, indent=4))

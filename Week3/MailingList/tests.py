@@ -26,6 +26,18 @@ class MailTests(unittest.TestCase):
 		self.f.close()
 		self.assertEqual("[1] Hack BG", content)
 
+	def test_get_arguments(self):
+		c = "merge 1 2 HACK_LIST"
+		a = List.get_arguments(c, 3)
+		self.assertEqual(['1', '2', 'HACK_LIST'], a)
+
+	def test_get_valid_filename(self):
+		list_name = "Hack BG Not Valid Filename"
+		self.assertEqual("Hack_BG_Not_Valid_Filename.txt", List.get_valid_filename(list_name))
+		list_name = "HackBG"
+		self.assertEqual("HackBG.txt", List.get_valid_filename(list_name))
+		line_of_file = "[1] John Smith - jsmith@gmail.com"
+
 
 if __name__ == '__main__':
 	unittest.main()

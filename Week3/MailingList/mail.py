@@ -32,11 +32,14 @@ def process_input(command):
 		printing_functions.print_elements_of_list(active_mailing_lists)
 
 	elif command.startswith('merge_lists'):
-		pass
+		arguments = List.get_arguments(command, 3)
+		first_list, second_list, name_new_list = arguments[0], arguments[1], arguments[2]
+		List.merge_lists(first_list, second_list, name_new_list)
 
 	elif command.startswith('export'):
-		pass
-
+		list_index = List.get_arguments(command, 1)
+		List.export(list_index)
+		
 	else:
 		printing_functions.bad_input_warning()
 
