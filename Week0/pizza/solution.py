@@ -54,6 +54,7 @@ def load(command):
     content = []
     for line in file:
         content += line.rstrip("\n").split(" - ")
+    file.close()
     names = content[::2]
     prices = content[1::2]
     orders = dict(zip(names, prices))
@@ -70,6 +71,7 @@ def print_list():
 
 
 def main():
+    file = open("archive.txt", "w").close()
     file_with_commands = open("menu_commands.txt", "r")
     print(file_with_commands.read())
     command = input("Enter your command> ")
@@ -115,21 +117,21 @@ def main():
             else:
                 print("Unknown command!!!")
 
-            command = input("Enter your command> ")
+        command = input("Enter your command> ")
 
-        else:
-            if is_order_saved is False:
-                file = open("unsaved_order.txt", "r")
-                print(file.read())
-                file.close()
+    else:
+        if is_order_saved is False:
+            file = open("unsaved_order.txt", "r")
+            print(file.read())
+            file.close()
 
-            command = input("Enter your command> ")
-            if command == 'save':
-                number_saves += 1
-                save(orders, number_saves)
-                print("Your order has been saved. Goodbye!")
-            elif command == 'finish':
-                print("Finishing order. Goodbye!")
+        command = input("Enter your command> ")
+        if command == 'save':
+            number_saves += 1
+            save(orders, number_saves)
+            print("Your order has been saved. Goodbye!")
+        elif command == 'finish':
+            print("Finishing order. Goodbye!")
 
 
 if __name__ == '__main__':

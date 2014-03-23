@@ -1,4 +1,5 @@
 import sys
+import os
 import unittest
 from solution import cat
 from subprocess import check_output
@@ -28,7 +29,12 @@ class CatFilesTest(unittest.TestCase):
 		content = check_output("python3 solution.py blah.txt", shell = True).decode("utf-8").rstrip("\n")
 		self.assertEqual(text, content)
 
+	def tearDown(self):
+		os.remove("blah.txt")
+
 
 
 if __name__ == '__main__':
+	os.chdir(os.getcwd() + '/cat')
 	unittest.main()
+	os.chdir(os.getcwd() + '/..')

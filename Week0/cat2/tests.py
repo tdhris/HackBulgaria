@@ -1,5 +1,6 @@
 import unittest
 from subprocess import check_output
+import os
 
 
 class CatMultiFilesTest(unittest.TestCase):
@@ -12,7 +13,7 @@ class CatMultiFilesTest(unittest.TestCase):
         self.f.write(text)
         self.f.close()
         self.f = open("cool.txt", "r")
-        content = check_output("python3 solution.py cool.txt", shell = True).decode("utf-8").rstrip("\n")
+        content = check_output("python3 solution.py cool.txt", shell=True).decode("utf-8").rstrip("\n")
         self.assertEqual(text, content)
 
     def test_two_files(self):
@@ -28,10 +29,11 @@ class CatMultiFilesTest(unittest.TestCase):
         self.f.write(text_second)
         self.f.close()
 
-        content = check_output("python3 solution.py cool.txt huh.txt", shell = True).decode("utf-8").rstrip("\n")
+        content = check_output("python3 solution.py cool.txt huh.txt", shell=True).decode("utf-8").rstrip("\n")
         self.assertEqual(text, content)
 
 
-
 if __name__ == '__main__':
+    os.chdir(os.getcwd() + '/cat2')
     unittest.main()
+    os.chdir(os.getcwd() + '/..')

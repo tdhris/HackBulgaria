@@ -16,9 +16,6 @@ class SumNumbersTests(unittest.TestCase):
 		self.f.close()
 		self.assertEqual(66, sum_numbers("numbers.txt"))
 
-	def test_3(self):
-		self.assertRaises(sum_numbers("nonexisting_file.txt"))
-
 
 if __name__ == '__main__':
 	unittest.main()

@@ -1,4 +1,5 @@
 import unittest
+import os
 from subprocess import check_output
 from solution import count_chars
 from solution import count_words
@@ -22,4 +23,6 @@ class CountTests(unittest.TestCase):
 
 
 if __name__ == '__main__':
-	unittest.main()
+    os.chdir(os.getcwd() + '/wc')
+    unittest.main()
+    os.chdir(os.getcwd() + '/..')
