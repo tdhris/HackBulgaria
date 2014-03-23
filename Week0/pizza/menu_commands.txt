@@ -1,0 +1,7 @@
+Enter one of the following commands:
+> 'take <name> <price>' to place your order
+> 'status' to check the status of the roder
+> 'save' to save your order
+> 'list' to see all saved orders
+> 'load' to load a saved order
+> 'finish' to exit the program

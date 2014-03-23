@@ -1,0 +1,4 @@
+You have not saved your order.
+If you wish to continue, type finish again.
+If you want to save your order, type save
+If you type finish again, the program will exit
