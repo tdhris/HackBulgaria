@@ -26,8 +26,8 @@ To represent the relationship between the two tables, it might be a good idea to
 
 Create a program ```movie_catalog.py``` that can take (and carry out) the following commands:
 
-- ```add_movie``` <-> The program promts the user to provide the title of the movie and the year it came out in.
-- ```add_actor <movie_id> [<actor_id>]``` <-> If actor_id is provided( note that it is optional ), the actor is added to the list of actors for that movie. If not, the actor is also added, with a new id, to the list of all actors.
+- ```add_movie``` <-> The program promts the user to provide the *title* of the movie, the *year* it came out in and the *rating*.
+- ```add_actor <movie_id> [<actor_id>]``` <-> Adds the actor with the given ``` actor_id```  to the cast of the movie corresponding to the movie_id provided. If you're adding to a movie an actor who hasn't been added *anywhere* before, you don't have to provide an id for the actor but be prompted for the name of the actor.
 - ```rate_movie <movie_id>``` <-> You can rate a movie with an integer from 1 to 10.
 - ```find_movies <rating>``` <-> Prints the titles of all movies with rating equal to the one provided.
 - ```actor_info <actor_id>```  <-> Prints the name of the actor and the title of every movie he/she stars in.
@@ -36,27 +36,33 @@ Create a program ```movie_catalog.py``` that can take (and carry out) the follow
 - ```list_actors``` <-> Prints the names of all actors who star in the movies in your catalog, along with their ids.
 - ```exit``` <-> Summon the green fairy that will take you to Neverland. Or just exit the program. Whatever.
 
+If something is unclear, please look at the examples below.
+
 ### Adding movies
 Below you can see an example of how this process should look like.
 ```
 > add_movie
 title> "12 Angry Men"
 year> 1957
+rating> 10
 "12 Angry Men" (1957) was added to your catalog!
 
 > add_movie
 title> "12 Angry Men"
 year> 1997
+rating> 8
 "12 Angry Men" (1997) was added to your catalog!
 
 > add_movie
 title> "The Avengers"
 year> 2012
+rating> 7
 "The Avengers" (2012) was added to your catalog!
 
 > add_movie
 title> "The Avengers"
 year> 2012
+rating> 7
 "The Avengers" (2012) is already in your catalog!
 ```
 You can add two movies with the same title *if they have not been released in the same year*. If *both* the title *and* the year are the same, the program assumes that the movie is already in your catalog.
@@ -71,6 +77,7 @@ You can add two movies with the same title *if they have not been released in th
 > add_movie
 title> "The Avengers"
 year> 1998
+rating> 6
 "The Avengers" (1998) was added to your catalog!
 
 > list_movies
@@ -93,6 +100,7 @@ Robert Downey Jr. was added to the list of actors of "The Avengers" (2012)
 > add_movie
 title> "Iron Man"
 year> 2008
+rating> 6
 "Iron Man" (2008) was added to your catalog!
 
 > add_actor 3 1
@@ -147,9 +155,9 @@ Cast: Robert Downey Jr.
 Rating: 5
 
 ```
-*Note*: If the movie has not been rated yet, the default rating is 5
 
 ### Rating movies
+You can change the rating of the movie corresponding to the movie_id you provide. Here's how this should go:
 ```
 > list_movies
 [1] "12 Angry Men" (1957)
@@ -159,6 +167,15 @@ Rating: 5
 [5] "Iron Man" (2008)
 
 > rate_movie 1
+rating> 8
+
+> movie_info 1
+Title: "12 Angry Men"
+Year: (1957)
+Cast: Henry Fonda
+Rating: 8
+
+> rate_movie 1
 rating> 10
 
 > movie_info 1
@@ -166,15 +183,6 @@ Title: "12 Angry Men"
 Year: (1957)
 Cast: Henry Fonda
 Rating: 10
-
-> rate_movie 5
-rating> 6
-
-> movie_info 5
-Title: "Iron Man"
-Year: (2008)
-Cast: Robert Downey Jr.
-Rating: 6
 
 ```
 
