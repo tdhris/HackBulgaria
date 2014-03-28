@@ -186,9 +186,9 @@ Rating: 10
 
 ```
 
-### Finding good movies
+### Finding movies
 
-The program prints a list of all movies with rating >= 7
+The program prints a list of all movies with rating equal to the rating provided by the user.
 ```
 > rate_movie 2
 rating> 6
@@ -196,8 +196,10 @@ rating> 6
 > rate_movie 3
 rating> 7
 
-> find_good_movies
+> find_movies 10
 [1] "12 Angry Men" (1957)
+
+> find_movies 7
 [3] "The Avengers" (2012)
 
 ```
