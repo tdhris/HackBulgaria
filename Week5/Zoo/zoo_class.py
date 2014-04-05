@@ -17,6 +17,10 @@ class Zoo:
 
     def accomodate_animal(self, animal_id, animal):
         if self.budget == 0:
+            print("Not enough money in this zoo")
+            return False
+        if self.animal_count == self.capacity:
+            print("The zoo has reached its capacity")
             return False
         self.animals[animal_id] = animal
         return True
@@ -31,6 +35,8 @@ class Zoo:
         return gains
 
     def simulate_time(self, days):
+        self.breed_animals(days)
+
         #age up every animal and get dead animals
         dead_animals = []
         for animal_id, animal in self.animals.items():
@@ -45,6 +51,17 @@ class Zoo:
         for animal_id in dead_animals:
             del self.animals[animal_id]
 
+        #add gains to budget
+        gains = self.calculate_gains() * days
+        self.budget += gains
+
+    def is_there_male(self, species):
+        for animal in self.animals.values():
+            if animal.specie == species and animal.gender == 'm':
+                return True
+        return False
+
+    def breed_animals(self, days):
         newborns = {}
         for animal in self.animals.values():
             if animal.can_breed() and self.is_there_male(animal.specie):
@@ -55,14 +72,4 @@ class Zoo:
 
         for newborn_id, newborn in newborns.items():
             self.animals[newborn_id] = newborn
-            animal.update_animals(animal_id)
-
-        #add gains to budget
-        gains = self.calculate_gains() * days
-        self.budget += gains
-
-    def is_there_male(self, species):
-        for animal in self.animals.values():
-            if animal.specie == species and animal.gender == 'm':
-                return True
-        return False
+            animal.update_animals(newborn_id)

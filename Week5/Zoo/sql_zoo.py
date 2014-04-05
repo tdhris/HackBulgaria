@@ -51,7 +51,8 @@ class SQLAdapter:
 
         for animal_id in animal_ids:
             animal = self.load_animal(animal_id)
-            animals[animal_id] = animal
+            if animal is not None:
+                animals[animal_id] = animal
         zoo.animals = animals
         return zoo
 
@@ -62,18 +63,21 @@ class SQLAdapter:
                              WHERE zoo_id = ?", (zoo_id,))
         for animal_id in zoo.animals.keys():
             self.add_animal_to_zoo(zoo_id, animal_id)
+        self.connection.commit()
 
     def add_animal_to_zoo(self, zoo_id, animal_id):
         self.cursor.execute("INSERT INTO zoo_animals(zoo_id, animal_id)\
                              VALUES (?, ?)", (zoo_id, animal_id))
+        self.cursor.execute("UPDATE zoos SET animal_count = animal_count + 1")
         self.connection.commit()
 
     def load_animal(self, animal_id):
         #get animal details
-        self.cursor.execute("SELECT specie, name, age, weight,\
-                                     gender, chance_of_dying, dead_or_alive\
+        self.cursor.execute("SELECT specie, name, age, weight, gender\
                              FROM animals WHERE id = ?", (animal_id,))
         unparsed_animal = self.cursor.fetchone()
+        if unparsed_animal is None:
+            return None
 
         specie = unparsed_animal[0]
         name = unparsed_animal[1]

@@ -198,17 +198,16 @@ class Animal():
         births = 0
 
         for day in range(days):
-            self.time_since_last_birth += 1
-            if not self.enough_time_since_last_birth():
-                pass
-            elif self.enough_time_since_last_birth():
+            if self.enough_time_since_last_birth():
                 if self.is_pregnant == 0:
                     self.get_pregnant()
                 elif self.time_pregnant >= gestation:
                     births += 1
-                    self.time_since_last_birth = 0
+                    self.time_since_last_birth = 1
                     self.is_pregnant = 0
                 elif self.is_pregnant == 1 and self.time_pregnant <= gestation:
                     self.time_pregnant += 1
+            else:
+                self.time_since_last_birth += 1
 
         return births
