@@ -1,6 +1,7 @@
 ##to add:
-- cat2 tests
-- pizza tests
 - timer.py
 - tictactoe.py
 - csv2json.py
+- grocery store and cinema
+- week5/ statistics
+
