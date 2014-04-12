@@ -8,6 +8,7 @@ conn = sqlite3.connect("bank2.db")
 cursor = conn.cursor()
 
 
+#creates tables 'clients' and 'tans'
 def create_clients_table():
     create_query = '''create table if not exists
         clients(id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +31,7 @@ def create_clients_table():
     cursor.execute(create_tan_table)
 
 
+#change the individual client's message
 def change_message(new_message, logged_user):
     update_sql = "UPDATE clients SET message = ? WHERE id = ?"
     cursor.execute(update_sql, (new_message, logged_user.get_id()))
@@ -44,6 +46,7 @@ def change_pass(new_pass, logged_user):
     conn.commit()
 
 
+#saves the code that the clients must use to change their password
 def save_changepass_code(user_id, code):
     currenttime = int(time.time())
     update_sql = 'UPDATE clients SET changepass_code = ?,\
@@ -53,7 +56,8 @@ def save_changepass_code(user_id, code):
     conn.commit()
 
 
-def get_changepass_code(user_id):
+#returns a tuple of the changepass code and the time it was generated
+def get_changepass_details(user_id):
     query = 'SELECT changepass_code, changepass_generated\
              FROM clients WHERE id = ?'
     cursor.execute(query, (user_id,))
@@ -83,7 +87,8 @@ def register(username, password, email):
 
 def login(username, provided_password):
     provided_password = hash_function(provided_password)
-    client, password = get_client_by_username(username)
+    client = get_client_by_username(username)
+    password = get_password_by_username
 
     if password != provided_password:
         failed_login(username)
@@ -101,7 +106,7 @@ def login(username, provided_password):
 
 
 def get_client_by_username(username):
-    select_query = "SELECT id, username, password, balance, message, email,\
+    select_query = "SELECT id, username, balance, message, email,\
                     failed_attempts, time_blocked FROM clients\
                     WHERE username = ?"
 
@@ -113,17 +118,24 @@ def get_client_by_username(username):
 
     user_id = user[0]
     username = user[1]
-    password = user[2]
-    balance = user[3]
-    message = user[4]
-    email = user[5]
-    failed_attempts = user[6]
-    time_blocked = user[7]
+    balance = user[2]
+    message = user[3]
+    email = user[4]
+    failed_attempts = user[5]
+    time_blocked = user[6]
 
     client = Client(user_id, username, balance, message, email,
                     failed_attempts, time_blocked)
     client.tans = get_tans(user_id)
-    return (client, password)
+    return client
+
+
+def get_password_by_username(username):
+    select_query = "SELECT password FROM clients\
+                    WHERE username = ?"
+    cursor.execute(select_query, (username,))
+    password = cursor.fetchone()[0]
+    return password
 
 
 def get_tans(user_id):

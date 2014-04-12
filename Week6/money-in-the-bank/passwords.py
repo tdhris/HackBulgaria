@@ -9,35 +9,48 @@ from string import ascii_letters
 ASCII = ascii_letters
 
 
-def change_password(logged_user):
-    user_email = logged_user.get_email()
-    user_id = logged_user.get_id()
+def reset_password(username):
+    user = sql_manager.get_client_by_username(username)
+    user_email = user.get_email()
+    user_id = user.get_id()
 
-    random_string = generate_random_string()
-    unique_hash_code = sql_manager.hash_function(random_string)
-    sql_manager.save_changepass_code(user_id, unique_hash_code)
-
-    changepass, code_generated = sql_manager.get_changepass_code(user_id)
+    changepass, code_generated = sql_manager.get_changepass_details(user_id)
     currenttime = int(time.time())
     five_minutes = 5 * 60
 
-    send_email(user_email, unique_hash_code, 'changing your email')
-
-    code = input("Enter the code you received at {0}".format(user_email + ": "))
+    code = input("Enter the code you received at {0}".format(
+        user_email + ": "))
     if code == changepass and currenttime < code_generated + five_minutes:
         new_pass = getpass("Enter your new password: ")
 
-        if sql_manager.strong_password(logged_user.get_username(), new_pass):
-            sql_manager.change_pass(new_pass, logged_user)
+        if sql_manager.strong_password(username, new_pass):
+            sql_manager.change_pass(new_pass, user)
             print("Password Successfully Changed")
         else:
             print("Your password is not strong enough.")
 
-        sql_manager.change_pass(new_pass, logged_user)
+        sql_manager.change_pass(new_pass, user)
     elif currenttime > code_generated + five_minutes:
         print("Sorry. You've entered a code that's no longer valid")
     else:
         print("Sorry, wrong code")
+
+
+def change_password(logged_user):
+    new_pass = getpass("Enter your new password: ")
+    sql_manager.change_pass(new_pass, logged_user)
+    print('Password Successfully Changed')
+
+
+def send_changepass_email(username):
+    user = sql_manager.get_client_by_username(username)
+    random_string = generate_random_string()
+    unique_hash_code = sql_manager.hash_function(random_string)
+    sql_manager.save_changepass_code(user.get_id(), unique_hash_code)
+
+    send_email(user.get_email(),
+               unique_hash_code,
+               'changing your email')
 
 
 def generate_random_string(length=15):
@@ -51,6 +64,10 @@ def generate_random_string(length=15):
 
 
 def send_tan(user):
+    '''
+    interface that handles the process of seinding TAN codes
+    which allows users to make transactions
+    '''
     tan_codes = []
     length = 32
     for i in range(10):

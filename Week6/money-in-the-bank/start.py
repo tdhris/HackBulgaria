@@ -1,6 +1,6 @@
 import sql_manager
 from getpass import getpass
-from passwords import change_password, send_tan
+from passwords import change_password, send_tan, send_changepass_email, reset_password
 
 
 def main_menu():
@@ -30,6 +30,15 @@ def main_menu():
                 logged_menu(logged_user)
             else:
                 print("Login failed")
+
+        elif command == 'send-reset-password':
+            username = input("Enter username: ")
+            send_changepass_email(username)
+            print('The changepass code was sent to your email')
+
+        elif command == 'reset-password':
+            username = input("Enter username: ")
+            reset_password(username)
 
         elif command == 'help':
             print("login - for logging in!")
@@ -74,7 +83,8 @@ def logged_menu(logged_user):
                     sql_manager.remove_used_tan(logged_user.get_id(), tan)
                     sql_manager.withdraw_money(logged_user.get_id(), amount)
                     logged_user.withdraw_money(amount)
-                    print("Successfull Transaction. You have: {0}".format(logged_user.get_balance()))
+                    print("Successfull Transaction. You have: {0}".format(
+                        logged_user.get_balance()))
                 else:
                     print("Sorry. Wrong or old tan code.")
             else:
@@ -88,7 +98,8 @@ def logged_menu(logged_user):
                 sql_manager.remove_used_tan(logged_user.get_id(), tan)
                 logged_user.deposit_money(amount)
                 sql_manager.deposit_money(logged_user.get_id(), amount)
-                print("Successfull Transaction. You have: {0}".format(logged_user.get_balance()))
+                print("Successfull Transaction. You have: {0}".format(
+                    logged_user.get_balance()))
             else:
                 print("Sorry, wrong or already used tan code")
 
@@ -104,7 +115,8 @@ def logged_menu(logged_user):
             if not tan_count:
                 send_tan(logged_user)
             else:
-                print("You have {0} remainig TAN codes to use".format(tan_count))
+                print("You have {0} remainig TAN codes to use".format(
+                    tan_count))
 
         elif command == 'exit':
             return
