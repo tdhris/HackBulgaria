@@ -43,6 +43,8 @@ def main_menu():
         elif command == 'help':
             print("login - for logging in!")
             print("register - for creating new account!")
+            print("send-reset-password - to get an email with the unique code")
+            print("reset-password - to reset your password")
             print("exit - for closing program!")
 
         elif command == 'exit':
@@ -103,20 +105,28 @@ def logged_menu(logged_user):
             else:
                 print("Sorry, wrong or already used tan code")
 
-        elif command == 'help':
-            print("info - for showing account info")
-            print("changepass - for changing passowrd")
-            print("change-message - for changing users message")
-            print("show-message - for showing users message")
-
         elif command == 'get-tan':
             tan_count = len(logged_user.tans)
-            print(tan_count)
             if not tan_count:
                 send_tan(logged_user)
             else:
                 print("You have {0} remainig TAN codes to use".format(
                     tan_count))
+
+        elif command == 'help':
+            print("info - for showing account info")
+            print("changepass - for changing passowrd")
+            print("change-message - for changing users message")
+            print("show-message - for showing users message")
+            print("show-balance - shows the balance in your bank account")
+            print("withdraw - to withdraw money from your bank account")
+            print("deposit - to deposit money into your bank account")
+            print("get-tan - ten new TAN codes are sent to your email")
+            print("logout - to log out")
+
+        elif command == 'logout':
+            print("Logging out. Bye.")
+            break
 
         elif command == 'exit':
             return

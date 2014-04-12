@@ -88,7 +88,7 @@ def register(username, password, email):
 def login(username, provided_password):
     provided_password = hash_function(provided_password)
     client = get_client_by_username(username)
-    password = get_password_by_username
+    password = get_password_by_username(username)
 
     if password != provided_password:
         failed_login(username)
