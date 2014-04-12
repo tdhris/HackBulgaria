@@ -1,12 +1,11 @@
 import hashlib
 import time
-from string import ascii_letters
+from passwords import strong_password
 import sqlite3
 from Client import Client
 
-conn = sqlite3.connect("bank.db")
+conn = sqlite3.connect("bank2.db")
 cursor = conn.cursor()
-# five_minutes_sec = 5 * 60
 
 
 def create_clients_table():
@@ -17,10 +16,18 @@ def create_clients_table():
                 balance REAL DEFAULT 0,
                 message TEXT,
                 email TEXT,
+                changepass_code TEXT,
+                changepass_generated INTEGER DEFAULT 0,
                 failed_attempts INTEGER DEFAULT 0,
-                time_blocked INTEGER DEFAULT 0)'''
+                time_blocked INTEGER DEFAULT 0) '''
 
     cursor.execute(create_query)
+
+    create_tan_table = '''create table if not exists
+            tans(user_id INTEGER, tan_code,
+                foreign key(user_id) references clients(id))'''
+
+    cursor.execute(create_tan_table)
 
 
 def change_message(new_message, logged_user):
@@ -35,6 +42,29 @@ def change_pass(new_pass, logged_user):
     update_sql = "UPDATE clients SET password = ? WHERE id = ?"
     cursor.execute(update_sql, (new_pass, logged_user.get_id()))
     conn.commit()
+
+
+def save_changepass_code(user_id, code):
+    currenttime = int(time.time())
+    update_sql = 'UPDATE clients SET changepass_code = ?,\
+                  changepass_generated = ?\
+                  WHERE id = ?'
+    cursor.execute(update_sql, (code, currenttime, user_id))
+    conn.commit()
+
+
+def get_changepass_code(user_id):
+    query = 'SELECT changepass_code, changepass_generated\
+             FROM clients WHERE id = ?'
+    cursor.execute(query, (user_id,))
+    unparsed_info = cursor.fetchone()
+
+    if not unparsed_info:
+        return False
+
+    changepass = unparsed_info[0]
+    changepass_generated = unparsed_info[1]
+    return (changepass, changepass_generated)
 
 
 def register(username, password, email):
@@ -53,27 +83,7 @@ def register(username, password, email):
 
 def login(username, provided_password):
     provided_password = hash_function(provided_password)
-
-    select_query = "SELECT id, username, password, balance, message, email,\
-                    failed_attempts, time_blocked FROM clients WHERE username = ?"
-
-
-    cursor.execute(select_query, (username,))
-    user = cursor.fetchone()
-
-    if not user:
-        return False
-
-    user_id = user[0]
-    username = user[1]
-    password = user[2]
-    balance = user[3]
-    message = user[4]
-    email = user[5]
-    failed_attempts = user[6]
-    time_blocked = user[7]
-
-    client = Client(user_id, username, balance, message, email, failed_attempts, time_blocked)
+    client, password = get_client_by_username(username)
 
     if password != provided_password:
         failed_login(username)
@@ -90,8 +100,48 @@ def login(username, provided_password):
     return client
 
 
+def get_client_by_username(username):
+    select_query = "SELECT id, username, password, balance, message, email,\
+                    failed_attempts, time_blocked FROM clients\
+                    WHERE username = ?"
+
+    cursor.execute(select_query, (username,))
+    user = cursor.fetchone()
+    #if no user with this username exists, return false
+    if not user:
+        return False
+
+    user_id = user[0]
+    username = user[1]
+    password = user[2]
+    balance = user[3]
+    message = user[4]
+    email = user[5]
+    failed_attempts = user[6]
+    time_blocked = user[7]
+
+    client = Client(user_id, username, balance, message, email,
+                    failed_attempts, time_blocked)
+    client.tans = get_tans(user_id)
+    return (client, password)
+
+
+def get_tans(user_id):
+    select_query = 'SELECT tan_code FROM tans WHERE user_id = ?'
+    cursor.execute(select_query, (user_id,))
+    tans = [tan[0] for tan in cursor.fetchall()]
+    return tans
+
+
+def remove_used_tan(user_id, tan):
+    delete_query = 'DELETE FROM tans WHERE tan_code = ? AND user_id = ?'
+    cursor.execute(delete_query, (tan, user_id))
+    conn.commit()
+
+
 def failed_login(username):
-    select_query = "SELECT failed_attempts, time_blocked FROM clients WHERE username = ?"
+    select_query = "SELECT failed_attempts, time_blocked\
+                    FROM clients WHERE username = ?"
     cursor.execute(select_query, (username,))
     failure_info = cursor.fetchone()
 
@@ -119,7 +169,8 @@ def block_user(username):
 
 
 def unblock_client(username):
-    update_query = "UPDATE clients SET time_blocked = 0 and failed_attempts = 0\
+    update_query = "UPDATE clients\
+                    SET time_blocked = 0 and failed_attempts = 0\
                     WHERE username = ?"
     cursor.execute(update_query, (username,))
     conn.commit()
@@ -131,43 +182,20 @@ def hash_function(password):
     return hash_function.hexdigest()
 
 
-def strong_password(username, password):
-    """
-    More then 8 symbols
-    Must have capital letters, and numbers and special symbol
-    Username is not in the password
-    """
-    if not eight_symbols(password):
-        return False
-    elif not special_symbols(password):
-        return False
-    elif username in password:
-        return False
-    else:
-        return True
+def deposit_money(user_id, amount):
+    update_query = "UPDATE clients SET balance = balance + ? WHERE id = ?"
+    cursor.execute(update_query, (amount, user_id))
+    conn.commit()
 
 
-def eight_symbols(password):
-    count = 0
-    for letter in password:
-        count += 1
-        if count >= 8:
-            return True
-    return False
+def withdraw_money(user_id, amount):
+    update_query = "UPDATE clients SET balance = balance - ? WHERE id = ?"
+    cursor.execute(update_query, (amount, user_id))
+    conn.commit()
 
 
-def special_symbols(password):
-    capital_letters_in_password = False
-    numbers_in_password = False
-    special_symbol_in_password = False
-    special_symbols = "][?/<~#` !@$%^&*()+=}|:;',\">{"
-
-    for symbol in password:
-        if symbol in ascii_letters.upper():
-            capital_letters_in_password = True
-        if symbol.isdigit():
-            numbers_in_password = True
-        if symbol in special_symbols:
-            special_symbol_in_password = True
-
-    return capital_letters_in_password and numbers_in_password and special_symbol_in_password
+def save_tan_codes(user_id, tan_codes):
+    insert_query = "INSERT INTO tans VALUES (?, ?)"
+    for tan_code in tan_codes:
+        cursor.execute(insert_query, (user_id, tan_code))
+    conn.commit()

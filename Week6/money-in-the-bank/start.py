@@ -1,12 +1,6 @@
 import sql_manager
 from getpass import getpass
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
-import string
-from random import randrange
-
-ASCII = string.ascii_letters
+from passwords import change_password, send_tan
 
 
 def main_menu():
@@ -56,7 +50,7 @@ def logged_menu(logged_user):
         if command == 'info':
             print("You are: " + logged_user.get_username())
             print("Your id is: " + str(logged_user.get_id()))
-            print("Your balance is:" + str(logged_user.get_balance()) + '$')
+            print("Your balance is: $" + str(logged_user.get_balance()))
 
         elif command == 'changepass':
             change_password(logged_user)
@@ -68,61 +62,52 @@ def logged_menu(logged_user):
         elif command == 'show-message':
             print(logged_user.get_message())
 
+        elif command == 'show-balance':
+            print(logged_user.get_balance())
+
+        elif command == 'withdraw':
+            amount = int(input("Enter amount: "))
+            tan = input("Enter tan code: ")
+            if amount < logged_user.get_balance():
+                if tan in logged_user.tans:
+                    logged_user.delete_tan(tan)
+                    sql_manager.remove_used_tan(logged_user.get_id(), tan)
+                    sql_manager.withdraw_money(logged_user.get_id(), amount)
+                    logged_user.withdraw_money(amount)
+                    print("Successfull Transaction. You have: {0}".format(logged_user.get_balance()))
+                else:
+                    print("Sorry. Wrong or old tan code.")
+            else:
+                print("Sorry. You're too poor to make this transaction")
+
+        elif command == 'deposit':
+            amount = int(input("Enter amount: "))
+            tan = input("Enter tan code: ")
+            if tan in logged_user.tans:
+                logged_user.delete_tan(tan)
+                sql_manager.remove_used_tan(logged_user.get_id(), tan)
+                logged_user.deposit_money(amount)
+                sql_manager.deposit_money(logged_user.get_id(), amount)
+                print("Successfull Transaction. You have: {0}".format(logged_user.get_balance()))
+            else:
+                print("Sorry, wrong or already used tan code")
+
         elif command == 'help':
             print("info - for showing account info")
             print("changepass - for changing passowrd")
             print("change-message - for changing users message")
             print("show-message - for showing users message")
 
+        elif command == 'get-tan':
+            tan_count = len(logged_user.tans)
+            print(tan_count)
+            if not tan_count:
+                send_tan(logged_user)
+            else:
+                print("You have {0} remainig TAN codes to use".format(tan_count))
 
-def change_password(logged_user):
-    user_email = logged_user.get_email()
-    random_string = generate_random_string()
-    unique_hash_code = sql_manager.hash_function(random_string)
-
-    send_email(user_email, unique_hash_code)
-    code = input("Enter the code you received at {0}".format(user_email + ": "))
-    if code == unique_hash_code:
-        new_pass = getpass("Enter your new password: ")
-
-        if sql_manager.strong_password(logged_user.get_username(), new_pass):
-            sql_manager.change_pass(new_pass, logged_user)
-            print("Password Successfully Changed")
-        else:
-            print("Your password is not strong enough.")
-
-        sql_manager.change_pass(new_pass, logged_user)
-    else:
-        print("Sorry, wrong code")
-
-
-def send_email(user_email, unique_hash_code):
-    smtp_host = "smtp.gmail.com"
-    login, passw = 'ttestov64', 'Blah$$1234'
-
-    message = MIMEText(unique_hash_code, 'plain', 'utf-8')
-    message['From'] = login
-    message['To'] = user_email
-    message['Subject'] = Header('changing your password', 'utf-8')
-
-    host = smtplib.SMTP(smtp_host, 587, timeout=10)
-    try:
-        host.starttls()
-        host.login(login, passw)
-        host.sendmail(message['From'], message['To'], message.as_string())
-    finally:
-        host.quit()
-
-
-def generate_random_string():
-    upper_bound = len(ASCII)
-    string_length = 15
-    random_string = ''
-
-    for i in range(string_length):
-        random_int = randrange(upper_bound)
-        random_string += ASCII[random_int]
-    return random_string
+        elif command == 'exit':
+            return
 
 
 def main():

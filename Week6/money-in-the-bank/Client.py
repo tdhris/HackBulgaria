@@ -12,12 +12,23 @@ class Client():
         self._email = email
         self._failed_attempts = failed_attempts
         self.time_blocked = time_blocked
+        self.tans = []
+
+    def delete_tan(self, tan):
+        self.tans.remove(tan)
 
     def get_username(self):
         return self.__username
 
     def get_balance(self):
         return self.__balance
+
+    def deposit_money(self, amount):
+        self.__balance += amount
+
+    def withdraw_money(self, amount):
+        if amount < self.__balance:
+            self.__balance -= amount
 
     def get_id(self):
         return self.__id
@@ -41,3 +52,8 @@ class Client():
     def is_blocked(self):
         current_time = int(time.time())
         return not current_time > self.time_blocked + FIVE_MINUTE_SEC
+
+    # @property
+    # def is_changepass_valid(self):
+    #     current_time = int(time.time())
+    #     return current_time > self.changepass_generated + FIVE_MINUTE_SEC
