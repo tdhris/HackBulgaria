@@ -139,4 +139,6 @@ class Dungeon:
         fight_to_the_death.simulate_fight()
         if self.hero.is_alive():
             self.change_position(position, new_position)
+            if isinstance(enemy, Anaconda):
+                self.hero.add_boss_benefits()
             return True

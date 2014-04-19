@@ -36,3 +36,9 @@ class Hero(Entity):
             return self.weapon.damage
         else:
             return self.weapon.damage * 2
+
+    def add_boss_benefits(self):
+        self.max_health += self.max_health * 0.1
+        self.health = self.max_health
+        self.weapon.damage += self.weapon.damage * 0.05
+        self.weapon.critical_strike_percent += self.weapon.critical_strike_percent * 0.03

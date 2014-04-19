@@ -1,6 +1,7 @@
 class Entity:
     def __init__(self, health):
-        self.health = health
+        self.max_health = health
+        self.health = self.max_health
 
     def get_health(self):
         return self.health
