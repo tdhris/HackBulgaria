@@ -19,6 +19,11 @@ class Weapon:
     def __repr__(self):
         return self.type + ", Damage:  " + str(self.damage)
 
+    def __eq__(self, other):
+        return self.type == other.type and\
+            self.damage == other.damage and\
+            self.critical_strike_percent == other.critical_strike_percent
+
     def get_weapon(self):
         return self.type
 

@@ -9,7 +9,7 @@ SNAKE_NAMES = ['Salazar', 'Ahktar', 'Kaa', 'Nagini',
 
 class Python(Entity):
     def __init__(self, health):
-        super().__init__(health)
+        Entity.__init__(self, health)
         self.damage = randrange(WEAK_ATTACK, STRONG_ATTACK)
         self.name = SNAKE_NAMES[randrange(len(SNAKE_NAMES))]
 

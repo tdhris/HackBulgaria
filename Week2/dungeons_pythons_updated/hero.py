@@ -6,7 +6,7 @@ DEFAULT_WEAPON = "Rusty Sword"
 
 class Hero(Entity):
     def __init__(self, name, health, nickname):
-        super().__init__(health)
+        Entity.__init__(self, health)
         self.name = name
         self.nickname = nickname
         bare_hands = Weapon(DEFAULT_WEAPON, 10, 0)
@@ -19,6 +19,8 @@ class Hero(Entity):
         return str(self)
 
     def take_healing(self, healing_points):
+        if not self.is_alive():
+            return False
         if healing_points > (100 - self.health):
             self.health = 100
             return False
