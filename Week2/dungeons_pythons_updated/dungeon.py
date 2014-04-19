@@ -84,7 +84,7 @@ class Dungeon:
         if self.map[new_position.x][new_position.y] == 'I':
             item = generate_item()
             if isinstance(item, Weapon):
-                if item.damage >= self.hero.weapon.damage:
+                if item.damage >= self.hero.weapon.damage and item.critical_strike_percent >= self.hero.weapon.critical_strike_percent:
                     self.hero.equip_weapon(item)
             elif isinstance(item, HealingPotion):
                 self.hero.take_healing(item.healing_points)

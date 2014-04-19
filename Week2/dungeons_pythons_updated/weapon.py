@@ -5,6 +5,7 @@ class Weapon:
     def __init__(self, weapon_type, damage, critical_strike_percent):
         self.type = weapon_type
         self.damage = damage
+        self.critical_strike_percent = critical_strike_percent
 
         if not isinstance(critical_strike_percent, float):
             self.critical_strike_percent = 0
